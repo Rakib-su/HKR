@@ -3,70 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hkr TechShop | Mobile Parts & Service</title>
+    <title>Hkr TechShop | Complete E-Commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Hind Siliguri', sans-serif; }
-        .product-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        body { font-family: 'Hind Siliguri', sans-serif; scroll-behavior: smooth; }
+        .bkash-bg { background-color: #e2136e; }
+        .modal-active { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-50 text-gray-800">
 
-    <header class="bg-[#ff6000] text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="bg-[#ff6000] text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold italic tracking-wider">Hkr TechShop</h1>
-                <p class="text-[10px] uppercase tracking-widest opacity-80">Trusted Mobile Solutions</p>
+                <h1 class="text-2xl font-bold italic tracking-tighter">Hkr TechShop</h1>
+                <p class="text-[10px] opacity-90 uppercase font-bold">Mobile Parts & Services</p>
             </div>
-            <div class="flex gap-4">
-                <span class="cursor-pointer">🔍</span>
-                <span class="cursor-pointer font-bold">🛒 0</span>
-            </div>
+            <button onclick="openAdmin()" class="bg-white text-[#ff6000] text-[10px] font-bold px-4 py-2 rounded-full shadow-md">ADMIN PANEL</button>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-6">
+    <main class="container mx-auto p-4">
         
-        <section id="admin-section" class="hidden mb-10 p-6 bg-white rounded-2xl shadow-2xl border-2 border-orange-500">
-            <h2 class="text-xl font-bold mb-4 text-orange-600 flex items-center gap-2">
-                ⚙️ অ্যাডমিন প্যানেল <span class="text-sm font-normal text-gray-400">(পণ্য যোগ করুন)</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input type="text" id="pName" placeholder="পণ্যের নাম (যেমন: iPhone 13 Display)" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-orange-400">
-                <input type="number" id="pPrice" placeholder="দাম (টাকা)" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-orange-400">
-                <input type="text" id="pImgLink" placeholder="ImgBB ডাইরেক্ট লিঙ্ক" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400 bg-blue-50">
-                <button onclick="saveProduct()" id="saveBtn" class="md:col-span-3 bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700 active:scale-95 transition-all">
-                    দোকানে সেভ করুন
-                </button>
+        <section id="admin-panel" class="hidden space-y-8 mb-12">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-8 border-blue-600">
+                <h2 class="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">📥 নতুন অর্ডারসমূহ</h2>
+                <div id="order-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
             </div>
-            <p class="text-[11px] mt-2 text-gray-500">নির্দেশনা: ImgBB থেকে ছবির <b>Direct Link</b> এখানে পেস্ট করবেন।</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-8 border-orange-500">
+                <h2 class="text-xl font-bold mb-4 text-orange-700">➕ নতুন পণ্য যোগ করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="pName" placeholder="পণ্যের নাম" class="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    <input type="number" id="pPrice" placeholder="দাম (টাকা)" class="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-orange-500">
+                    <div class="space-y-2">
+                        <input type="text" id="pImg" oninput="updatePreview()" placeholder="ImgBB Direct Link" class="w-full p-3 border rounded-xl bg-orange-50 outline-none focus:ring-2 focus:ring-orange-500">
+                        <img id="pPreview" src="" class="hidden h-20 w-20 object-cover rounded border">
+                    </div>
+                    <button onclick="addNewProduct()" id="uploadBtn" class="md:col-span-3 bg-orange-600 text-white font-bold py-4 rounded-xl hover:bg-orange-700 shadow-lg transition-all">পণ্য আপলোড করুন</button>
+                </div>
+            </div>
         </section>
 
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold border-l-4 border-[#ff6000] pl-3">আমাদের পণ্যসমূহ</h2>
-            <div class="text-sm text-gray-500">নতুন আপডেট</div>
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-xl font-bold border-l-4 border-[#ff6000] pl-3 italic">আমাদের কালেকশন</h2>
+            <div class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">LIVE SHOP</div>
         </div>
 
-        <div id="loading" class="text-center py-20">
-            <div class="animate-spin inline-block w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div>
-            <p class="mt-2 text-gray-500">লোডিং হচ্ছে...</p>
-        </div>
-
-        <div id="productList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div id="product-list" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             </div>
     </main>
 
-    <footer class="bg-gray-800 text-white mt-20 py-10">
-        <div class="container mx-auto px-4 text-center">
-            <p class="font-bold">Hkr TechShop &copy; 2026</p>
-            <p class="text-sm opacity-60">দিনাজপুর, বাংলাদেশ</p>
+    <div id="order-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden modal-active">
+            <div class="bkash-bg p-5 text-white text-center">
+                <h2 class="text-2xl font-bold">অর্ডার নিশ্চিত করুন</h2>
+                <p id="p-label" class="text-xs opacity-90 font-bold mt-1"></p>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <input type="text" id="cName" placeholder="আপনার নাম" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                <input type="tel" id="cPhone" placeholder="মোবাইল নম্বর" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-500">
+                <textarea id="cAddress" placeholder="পুরো ঠিকানা" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-pink-500"></textarea>
+                
+                <div class="bg-gray-100 p-3 rounded-xl">
+                    <p class="text-[10px] font-bold mb-2 uppercase text-gray-500">পেমেন্ট মেথড:</p>
+                    <select id="payMethod" onchange="toggleBkash()" class="w-full p-2 border rounded-lg font-bold">
+                        <option value="Cash on Delivery">Cash on Delivery</option>
+                        <option value="Bkash">Bkash (বিকাশ)</option>
+                    </select>
+                </div>
+
+                <div id="bkash-info" class="hidden bg-pink-50 p-4 rounded-2xl border border-pink-200">
+                    <p class="text-[11px] text-pink-700 font-bold mb-2 italic">বিকাশ করুন (Send Money/Cash In):</p>
+                    <div class="bg-white p-2 rounded-lg border border-pink-400 text-center mb-3">
+                        <span class="text-xl font-black text-pink-600">01839454997</span>
+                    </div>
+                    <input type="text" id="trxId" placeholder="TrxID দিন" class="w-full p-3 border border-pink-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-500">
+                </div>
+
+                <button onclick="confirmOrder()" id="finalBtn" class="w-full bkash-bg text-white font-bold py-4 rounded-2xl shadow-xl hover:opacity-90 active:scale-95 transition-all">অর্ডার সম্পন্ন করুন</button>
+                <button onclick="closeModal()" class="w-full text-gray-400 text-xs font-bold">এখন না</button>
+            </div>
         </div>
-    </footer>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnVLPIGbxn2rrKL8EwGSCey9A8JNiZkBA",
@@ -79,60 +106,97 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let currentProduct = "";
 
-        // ১. অ্যাডমিন মোড চেক (URL-এ ?admin থাকলে প্যানেল খুলবে)
-        if (window.location.search.includes('admin')) {
-            document.getElementById('admin-section').classList.remove('hidden');
-        }
-
-        // ২. ডাটাবেসে পণ্য সেভ করা
-        window.saveProduct = async () => {
-            const name = document.getElementById('pName').value;
-            const price = document.getElementById('pPrice').value;
-            const img = document.getElementById('pImgLink').value;
-            const btn = document.getElementById('saveBtn');
-
-            if(!name || !price || !img) return alert("সবগুলো তথ্য দিন!");
-
-            btn.disabled = true;
-            btn.innerText = "সেভ হচ্ছে...";
-
-            try {
-                await addDoc(collection(db, "products"), {
-                    name, price, img, date: new Date()
-                });
-                alert("পণ্যটি সফলভাবে যোগ করা হয়েছে!");
-                location.reload();
-            } catch (e) {
-                alert("এরর! ফায়ারবেস রুলস চেক করুন।");
-                btn.disabled = false;
-            }
+        // Admin Access
+        window.openAdmin = () => {
+            if(prompt("অ্যাডমিন পাসওয়ার্ড:") === "1234") {
+                document.getElementById('admin-panel').classList.toggle('hidden');
+                window.scrollTo(0,0);
+            } else { alert("ভুল পাসওয়ার্ড!"); }
         };
 
-        // ৩. রিয়েল-টাইম ডাটা কাস্টমারকে দেখানো
-        const q = query(collection(db, "products"), orderBy("date", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById('productList');
-            document.getElementById('loading').classList.add('hidden');
-            list.innerHTML = "";
-            
-            snapshot.forEach(doc => {
-                const p = doc.data();
+        // UI Functions
+        window.updatePreview = () => {
+            const link = document.getElementById('pImg').value;
+            const img = document.getElementById('pPreview');
+            if(link.includes('http')) { img.src = link; img.classList.remove('hidden'); }
+        };
+
+        window.buyNow = (name) => {
+            currentProduct = name;
+            document.getElementById('p-label').innerText = "পণ্য: " + name;
+            document.getElementById('order-modal').classList.remove('hidden');
+        };
+
+        window.closeModal = () => document.getElementById('order-modal').classList.add('hidden');
+
+        window.toggleBkash = () => {
+            const method = document.getElementById('payMethod').value;
+            document.getElementById('bkash-info').classList.toggle('hidden', method !== 'Bkash');
+        };
+
+        // Database Functions
+        window.addNewProduct = async () => {
+            const n = document.getElementById('pName').value, pr = document.getElementById('pPrice').value, im = document.getElementById('pImg').value;
+            if(!n || !pr || !im) return alert("সব তথ্য দিন!");
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true; btn.innerText = "আপলোড হচ্ছে...";
+            await addDoc(collection(db, "products"), { name: n, price: pr, img: im, time: new Date() });
+            alert("পণ্য যোগ হয়েছে!");
+            location.reload();
+        };
+
+        window.confirmOrder = async () => {
+            const n = document.getElementById('cName').value, p = document.getElementById('cPhone').value, a = document.getElementById('cAddress').value;
+            const m = document.getElementById('payMethod').value, t = document.getElementById('trxId').value;
+            if(!n || !p || !a) return alert("সব তথ্য দিন!");
+            if(m === 'Bkash' && !t) return alert("TrxID দিন!");
+
+            document.getElementById('finalBtn').innerText = "অর্ডার হচ্ছে...";
+            try {
+                await addDoc(collection(db, "orders"), {
+                    product: currentProduct, customer: n, phone: p, address: a, method: m, trx: t || "N/A", date: new Date().toLocaleString()
+                });
+                alert("ধন্যবাদ! অর্ডারটি সফল হয়েছে।");
+                closeModal();
+            } catch (e) { alert("এরর! আবার চেষ্টা করুন।"); }
+            document.getElementById('finalBtn').innerText = "অর্ডার সম্পন্ন করুন";
+        };
+
+        // Real-time Listeners
+        onSnapshot(query(collection(db, "products"), orderBy("time", "desc")), (s) => {
+            const list = document.getElementById('product-list'); list.innerHTML = "";
+            s.forEach(d => {
+                const p = d.data();
                 list.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-sm product-card overflow-hidden border border-gray-100 flex flex-col">
-                        <div class="h-40 overflow-hidden bg-gray-200">
-                            <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition duration-300">
+                        <img src="${p.img}" class="h-36 w-full object-cover" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                        <div class="p-3">
+                            <h3 class="font-bold text-xs h-8 overflow-hidden">${p.name}</h3>
+                            <p class="text-[#ff6000] font-black text-sm my-2">৳ ${p.price}</p>
+                            <button onclick="buyNow('${p.name}')" class="w-full bg-orange-500 text-white py-2 rounded-xl text-[10px] font-bold shadow-sm hover:bg-orange-600 transition">অর্ডার করুন</button>
                         </div>
-                        <div class="p-3 flex-grow">
-                            <h3 class="font-bold text-sm text-gray-700 h-10 overflow-hidden leading-tight">${p.name}</h3>
-                            <p class="text-[#ff6000] font-extrabold text-lg mt-2 font-sans">৳ ${p.price}</p>
-                        </div>
-                        <button class="w-full bg-gray-50 text-gray-600 py-2 text-xs font-bold hover:bg-orange-50 hover:text-[#ff6000] transition-colors border-t border-gray-100">
-                            অর্ডার করুন
-                        </button>
                     </div>`;
             });
         });
+
+        onSnapshot(query(collection(db, "orders"), orderBy("date", "desc")), (s) => {
+            const d = document.getElementById('order-display'); d.innerHTML = "";
+            s.forEach(o => {
+                const data = o.data(), id = o.id;
+                d.innerHTML += `
+                    <div class="p-4 bg-white border-l-8 ${data.method==='Bkash'?'border-pink-500':'border-gray-300'} shadow-md rounded-r-xl relative">
+                        <p class="font-bold text-sm">🛍️ ${data.product}</p>
+                        <p class="text-xs font-bold mt-1">👤 ${data.customer} (${data.phone})</p>
+                        <p class="text-[10px] text-gray-500 italic mt-1 font-bold">🏠 ${data.address}</p>
+                        <p class="text-[9px] mt-2 font-bold ${data.method==='Bkash'?'text-pink-600':'text-gray-400'} uppercase">পেমেন্ট: ${data.method} ${data.trx !== 'N/A' ? '| Trx: '+data.trx : ''}</p>
+                        <button onclick="delOrder('${id}')" class="absolute top-2 right-2 text-red-400 text-[10px] font-bold">ডিলিট</button>
+                    </div>`;
+            });
+        });
+
+        window.delOrder = async (id) => { if(confirm("অর্ডারটি মুছে ফেলবেন?")) await deleteDoc(doc(db, "orders", id)); };
     </script>
 </body>
 </html>
