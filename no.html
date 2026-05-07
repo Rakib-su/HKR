@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="bn" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hkr TechShop | No. 1 Mobile Parts Marketplace</title>
+    
+    <meta name="description" content="Bangladesh's premium mobile parts store. High-quality displays, batteries, and tools.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { primary: '#ff6000', darkBg: '#0f172a', darkCard: '#1e293b' },
+                    borderRadius: { '4xl': '2.5rem' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; transition: 0.3s; scroll-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .cart-sidebar { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cart-open { transform: translateX(0) !important; }
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-load 1.5s infinite; }
+        @keyframes skeleton-load { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .glass-nav { background: rgba(255, 96, 0, 0.95); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white">
+
+    <aside id="cartSidebar" class="fixed top-0 right-0 w-full md:w-[450px] h-full bg-white dark:bg-darkCard z-[2000] shadow-2xl translate-x-full cart-sidebar flex flex-col border-l dark:border-slate-800">
+        <div class="p-6 bg-primary text-white flex justify-between items-center shadow-lg">
+            <h2 class="text-xl font-black flex items-center gap-2"><i data-lucide="shopping-cart"></i> শপিং কার্ট</h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-black/10 rounded-full transition text-2xl">&times;</button>
+        </div>
+        <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+            </div>
+        <div class="p-8 border-t dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-slate-500 font-bold uppercase tracking-widest text-xs">মোট প্রদেয় বিল</span>
+                <span id="cartTotal" class="text-3xl font-black text-primary italic">৳0</span>
+            </div>
+            <button onclick="processCheckout()" class="w-full bg-primary hover:bg-orange-600 text-white py-5 rounded-[22px] font-black text-xl shadow-xl shadow-orange-500/30 active:scale-95 transition-all uppercase tracking-tighter">অর্ডার কনফার্ম করুন</button>
+        </div>
+    </aside>
+
+    <nav class="glass-nav text-white sticky top-0 z-[1000] shadow-2xl border-b border-white/10">
+        <div class="container mx-auto px-4 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                <div class="bg-white p-2.5 rounded-2xl shadow-inner transform -rotate-3 hover:rotate-0 transition"><i data-lucide="cpu" class="text-primary w-6 h-6"></i></div>
+                <div>
+                    <h1 class="text-2xl font-black italic tracking-tighter leading-none">Hkr TechShop</h1>
+                    <span class="text-[9px] uppercase tracking-[0.4em] font-bold opacity-80">Premium Hub</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 md:gap-6">
+                <button onclick="toggleDark()" class="p-3 rounded-2xl bg-white/15 hover:bg-white/30 transition shadow-inner"><i data-lucide="moon" class="w-5 h-5"></i></button>
+                <div class="relative cursor-pointer group" onclick="toggleCart()">
+                    <div class="p-3 bg-white/15 rounded-2xl group-hover:bg-white group-hover:text-primary transition-all shadow-inner">
+                        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                    </div>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-black text-white text-[10px] w-6 h-6 rounded-full border-2 border-white flex items-center justify-center font-black">0</span>
+                </div>
+                <button id="login-btn" onclick="googleLogin()" class="bg-white text-primary px-6 py-2.5 rounded-full text-xs font-black shadow-xl hover:scale-105 transition active:scale-95">লগইন</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-16 md:py-24 bg-gradient-to-b from-primary/10 to-transparent relative overflow-hidden">
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-4xl md:text-7xl font-black mb-8 tracking-tighter leading-tight">সেরা কোয়ালিটির <br><span class="text-primary">মোবাইল পার্টস</span> এখানে পাবেন</h2>
+            <div class="max-w-3xl mx-auto flex gap-3 p-2.5 bg-white dark:bg-darkCard rounded-[35px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border dark:border-slate-800">
+                <div class="relative flex-1">
+                    <input type="text" id="searchInput" placeholder="মডেল বা পার্টসের নাম লিখুন..." class="w-full p-5 pl-14 rounded-2xl border-none dark:bg-darkCard outline-none text-lg font-medium">
+                    <i data-lucide="search" class="absolute left-6 top-5 opacity-40 text-primary"></i>
+                </div>
+                <button onclick="startVoiceSearch()" class="p-5 bg-slate-50 dark:bg-slate-800 rounded-[25px] hover:text-primary transition-all active:scale-90 group shadow-sm">
+                    <i data-lucide="mic" class="group-active:animate-ping"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 pb-24">
+        <section id="user-section" class="hidden mb-12 p-8 bg-white dark:bg-darkCard rounded-[3rem] shadow-2xl border-l-[10px] border-green-500">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black italic flex items-center gap-3"><i data-lucide="package"></i> আপনার অর্ডার হিস্ট্রি</h2>
+                <button onclick="logout()" class="text-red-500 font-black text-xs uppercase tracking-widest hover:underline px-4 py-2 bg-red-50 dark:bg-red-900/10 rounded-full">Logout</button>
+            </div>
+            <div id="user-orders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+        <div class="flex gap-4 overflow-x-auto pb-8 no-scrollbar mb-12">
+            <button onclick="filterCat(event, 'All')" class="cat-btn active bg-primary text-white px-10 py-4 rounded-[22px] font-black shadow-xl shadow-orange-500/40 whitespace-nowrap">সব স্টক</button>
+            <button onclick="filterCat(event, 'Display')" class="cat-btn bg-white dark:bg-darkCard px-10 py-4 rounded-[22px] font-black shadow-lg border dark:border-slate-800 whitespace-nowrap hover:border-primary/50 transition-all">Display</button>
+            <button onclick="filterCat(event, 'Battery')" class="cat-btn bg-white dark:bg-darkCard px-10 py-4 rounded-[22px] font-black shadow-lg border dark:border-slate-800 whitespace-nowrap hover:border-primary/50 transition-all">Battery</button>
+            <button onclick="filterCat(event, 'Tools')" class="cat-btn bg-white dark:bg-darkCard px-10 py-4 rounded-[22px] font-black shadow-lg border dark:border-slate-800 whitespace-nowrap hover:border-primary/50 transition-all">Tools</button>
+        </div>
+
+        <div id="product-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-10">
+            </div>
+    </main>
+
+    <div id="admin-panel" class="hidden fixed bottom-10 left-10 z-[5000]">
+        <div id="admin-modal" class="hidden absolute bottom-24 left-0 w-[380px] bg-white dark:bg-darkCard p-8 rounded-[2.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.3)] border-t-[10px] border-indigo-600">
+            <h3 class="font-black text-indigo-600 text-xl mb-6 flex items-center gap-2"><i data-lucide="plus-circle"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
+            <div class="space-y-4">
+                <input type="text" id="pName" placeholder="Product Name" class="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 transition">
+                <input type="number" id="pPrice" placeholder="Price (৳)" class="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 transition">
+                <input type="text" id="pImg" placeholder="Image URL (Direct)" class="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 transition">
+                <select id="pCat" class="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl font-black outline-none border-none">
+                    <option value="Display">Display</option>
+                    <option value="Battery">Battery</option>
+                    <option value="Tools">Tools</option>
+                    <option value="Others">Others</option>
+                </select>
+                <button onclick="addNewProduct()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl transition-all active:scale-95">সেভ করুন</button>
+            </div>
+        </div>
+        <button onclick="toggleAdmin()" class="w-18 h-18 bg-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all border-4 border-white dark:border-darkCard">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
+    </div>
+
+    <a href="https://wa.me/8801832454997" target="_blank" class="fixed bottom-10 right-10 bg-[#25d366] text-white p-5 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all z-[1000] flex items-center justify-center">
+        <i data-lucide="message-circle" class="w-8 h-8"></i>
+    </a>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, limit, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnVLPIGbxn2rrKL8EwGSCey9A8JNiZkBA",
+            authDomain: "hkrtechshop.firebaseapp.com",
+            projectId: "hkrtechshop",
+            storageBucket: "hkrtechshop.firebasestorage.app",
+            messagingSenderId: "988751396186",
+            appId: "1:988751396186:web:1fce5757b048963affc763"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        const ADMIN_EMAIL = "rrrrakib55@gmail.com";
+
+        let state = {
+            cart: JSON.parse(localStorage.getItem("hkr_v9_cart")) || [],
+            currentUser: null,
+            category: "All",
+            search: ""
+        };
+
+        // --- Helper: Toast Notification ---
+        function toast(m) {
+            const t = document.createElement("div");
+            t.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-3xl z-[10000] font-black text-sm shadow-2xl animate-bounce border-t-4 border-primary";
+            t.innerText = m;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        // --- UI Handlers ---
+        window.toggleCart = () => document.getElementById("cartSidebar").classList.toggle("cart-open");
+        window.toggleDark = () => document.documentElement.classList.toggle("dark");
+        window.toggleAdmin = () => document.getElementById("admin-modal").classList.toggle("hidden");
+
+        // --- Auth Module ---
+        window.googleLogin = () => signInWithPopup(auth, provider).catch(() => toast("Login Error!"));
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            state.currentUser = user;
+            const btn = document.getElementById("login-btn");
+            if (user) {
+                btn.innerText = user.displayName.split(" ")[0].toUpperCase();
+                document.getElementById("user-section").classList.remove("hidden");
+                loadUserOrders(user.email);
+                if (user.email === ADMIN_EMAIL) document.getElementById("admin-panel").classList.remove("hidden");
+            } else {
+                btn.innerText = "LOGIN";
+                document.getElementById("user-section").classList.add("hidden");
+                document.getElementById("admin-panel").classList.add("hidden");
+            }
+            refreshStore();
+        });
+
+        // --- Product Engine (Optimized Firestore) ---
+        function refreshStore() {
+            const container = document.getElementById("product-list");
+            container.innerHTML = Array(10).fill(0).map(() => `<div class="skeleton h-[350px] rounded-[2.5rem]"></div>`).join("");
+
+            let q = query(collection(db, "products"), orderBy("createdAt", "desc"), limit(50));
+            if (state.category !== "All") q = query(collection(db, "products"), where("cat", "==", state.category), orderBy("createdAt", "desc"), limit(50));
+
+            onSnapshot(q, (snap) => {
+                container.innerHTML = "";
+                snap.forEach(d => {
+                    const p = d.data();
+                    if (state.search && !p.name.toLowerCase().includes(state.search.toLowerCase())) return;
+                    
+                    container.innerHTML += `
+                        <div class="group bg-white dark:bg-darkCard rounded-[2.5rem] shadow-lg hover:shadow-[0_25px_50px_rgba(0,0,0,0.15)] transition-all duration-700 border border-slate-100 dark:border-slate-800 relative overflow-hidden flex flex-col h-full">
+                            ${state.currentUser?.email === ADMIN_EMAIL ? `<button onclick="deleteProduct('${d.id}')" class="absolute top-5 right-5 bg-red-600 text-white w-9 h-9 rounded-full z-20 shadow-xl opacity-0 group-hover:opacity-100 transition-all font-bold">✕</button>` : ''}
+                            <div class="h-44 md:h-52 overflow-hidden relative">
+                                <img src="${p.img}" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-1000" onerror="this.src='https://placehold.co/400x400?text=Hkr+Shop'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            </div>
+                            <div class="p-6 flex flex-col flex-1">
+                                <span class="text-[9px] font-black uppercase text-primary bg-orange-50 dark:bg-orange-950/30 px-3 py-1 rounded-lg w-fit">${p.cat}</span>
+                                
+                                <h3 class="text-[14px] font-black text-red-600 dark:text-red-500 mt-4 flex-1 line-clamp-2 italic uppercase tracking-tight leading-tight">
+                                    ${p.name}
+                                </h3>
+
+                                <div class="flex justify-between items-end mt-6">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 font-bold italic uppercase">Offer Price</span>
+                                        <span class="text-2xl font-black text-primary italic leading-none">৳${p.price}</span>
+                                    </div>
+                                    <button onclick='addToCart({id:"${d.id}", name:"${p.name}", price:${p.price}, img:"${p.img}"})' class="bg-primary text-white w-14 h-14 rounded-2xl shadow-[0_10px_20px_rgba(255,96,0,0.3)] hover:bg-black transition-all flex items-center justify-center active:scale-90">
+                                        <i data-lucide="plus" class="w-8 h-8"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                lucide.createIcons();
+            });
+        }
+
+        // --- Cart System (Persistent) ---
+        window.addToCart = (p) => {
+            const i = state.cart.findIndex(item => item.id === p.id);
+            if (i > -1) state.cart[i].qty++;
+            else state.cart.push({...p, qty: 1});
+            saveCart();
+            toast("কার্টে যোগ হয়েছে!");
+        };
+
+        window.updateQty = (id, amt) => {
+            const i = state.cart.findIndex(item => item.id === id);
+            state.cart[i].qty += amt;
+            if (state.cart[i].qty <= 0) state.cart.splice(i, 1);
+            saveCart();
+        };
+
+        function saveCart() {
+            localStorage.setItem("hkr_v9_cart", JSON.stringify(state.cart));
+            renderCartUI();
+        }
+
+        function renderCartUI() {
+            const cont = document.getElementById("cartItems");
+            const totalE = document.getElementById("cartTotal");
+            const countE = document.getElementById("cartCount");
+            cont.innerHTML = state.cart.length === 0 ? `<div class="h-full flex flex-col items-center justify-center opacity-10 font-bold italic"><i data-lucide="shopping-bag" class="w-24 h-24 mb-4"></i> ঝুড়ি খালি</div>` : "";
+            
+            let total = 0;
+            state.cart.forEach(item => {
+                total += item.price * item.qty;
+                cont.innerHTML += `
+                    <div class="flex gap-4 bg-slate-50 dark:bg-slate-900/40 p-4 rounded-3xl border dark:border-slate-800 shadow-sm animate-in fade-in zoom-in duration-300">
+                        <img src="${item.img}" class="w-16 h-16 rounded-2xl object-cover shadow-md">
+                        <div class="flex-1">
+                            <h4 class="text-[12px] font-black text-red-600 dark:text-red-500 italic uppercase leading-none mb-2 line-clamp-1">${item.name}</h4>
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="font-black text-primary italic text-sm leading-none">৳${item.price * item.qty}</span>
+                                <div class="flex items-center gap-3 bg-white dark:bg-darkCard rounded-full px-4 py-1.5 shadow-sm border dark:border-slate-700">
+                                    <button onclick="updateQty('${item.id}', -1)" class="text-slate-400 hover:text-red-600 transition font-bold">-</button>
+                                    <span class="text-xs font-black min-w-[20px] text-center">${item.qty}</span>
+                                    <button onclick="updateQty('${item.id}', 1)" class="text-slate-400 hover:text-green-600 transition font-bold">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            totalE.innerText = `৳${total}`;
+            countE.innerText = state.cart.reduce((a, b) => a + b.qty, 0);
+            lucide.createIcons();
+        }
+
+        // --- Search & Filtering ---
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            state.search = e.target.value;
+            refreshStore();
+        });
+
+        window.filterCat = (e, cat) => {
+            state.category = cat;
+            document.querySelectorAll(".cat-btn").forEach(b => {
+                b.className = "cat-btn bg-white dark:bg-darkCard px-10 py-4 rounded-[22px] font-black shadow-lg border dark:border-slate-800 transition-all";
+            });
+            e.currentTarget.className = "cat-btn bg-primary text-white px-10 py-4 rounded-[22px] font-black shadow-xl shadow-orange-500/40 transition-all";
+            refreshStore();
+        };
+
+        window.startVoiceSearch = () => {
+            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Speech) return toast("Browser not supported!");
+            const rec = new Speech();
+            rec.lang = 'bn-BD';
+            rec.start();
+            toast("বলুন, আমি শুনছি...");
+            rec.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                document.getElementById("searchInput").value = text;
+                state.search = text;
+                refreshStore();
+            };
+        };
+
+        // --- Admin & Database Actions ---
+        window.addNewProduct = async () => {
+            const n = document.getElementById("pName").value, pr = document.getElementById("pPrice").value, im = document.getElementById("pImg").value, c = document.getElementById("pCat").value;
+            if (!n || !pr || !im) return toast("সব তথ্য দিন!");
+            try {
+                await addDoc(collection(db, "products"), { name: n, price: Number(pr), img: im, cat: c, createdAt: serverTimestamp() });
+                toast("স্টক সফলভাবে আপডেট হয়েছে!");
+                toggleAdmin();
+            } catch (e) { toast("Error!"); }
+        };
+
+        window.deleteProduct = async (id) => { if(confirm("মুছে ফেলতে চান?")) await deleteDoc(doc(db, "products", id)); };
+
+        window.processCheckout = async () => {
+            if (!state.currentUser) return toast("অর্ডার করতে লগইন করুন!");
+            if (state.cart.length === 0) return toast("কার্ট খালি!");
+            
+            try {
+                await addDoc(collection(db, "orders"), {
+                    userId: state.currentUser.uid,
+                    email: state.currentUser.email,
+                    items: state.cart,
+                    total: state.cart.reduce((a, b) => a + (b.price * b.qty), 0),
+                    status: "প্রসেসিং",
+                    createdAt: serverTimestamp()
+                });
+                state.cart = [];
+                saveCart();
+                toggleCart();
+                toast("অর্ডার সফল হয়েছে! ধন্যবাদ।");
+            } catch (e) { toast("সার্ভার সমস্যা!"); }
+        };
+
+        function loadUserOrders(email) {
+            const q = query(collection(db, "orders"), where("email", "==", email), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snap) => {
+                const cont = document.getElementById("user-orders");
+                cont.innerHTML = snap.empty ? `<p class="opacity-30 italic text-sm">কোন পূর্ববর্তী অর্ডার নেই।</p>` : "";
+                snap.forEach(d => {
+                    const o = d.data();
+                    cont.innerHTML += `
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[2rem] border-l-[8px] border-orange-500 shadow-sm flex justify-between items-center group hover:bg-white transition-all">
+                            <div>
+                                <h4 class="font-black text-[10px] tracking-widest text-slate-400 uppercase">Order ID: #${d.id.slice(0,6).toUpperCase()}</h4>
+                                <p class="text-sm font-black text-green-500 mt-1 uppercase italic">${o.status}</p>
+                            </div>
+                            <span class="text-xl font-black text-primary italic">৳${o.total}</span>
+                        </div>`;
+                });
+            });
+        }
+
+        // Initialize Icons & UI
+        lucide.createIcons();
+        renderCartUI();
+    </script>
+</body>
+</html>
