@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hkr TechShop | Expert Mobile Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; scroll-behavior: smooth; }
+        .bkash-bg { background-color: #e2136e; }
+        .transition-soft { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-fade { animation: modalFade 0.3s ease-out; }
+        @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <header class="bg-[#ff6000] text-white p-4 shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="cursor-pointer" onclick="window.scrollTo(0,0)">
+                <h1 class="text-2xl font-bold italic tracking-tighter">Hkr TechShop</h1>
+                <p class="text-[10px] opacity-90 uppercase font-bold tracking-widest">Digital Mobile Solutions</p>
+            </div>
+            <button onclick="openAdmin()" class="bg-white text-[#ff6000] text-xs font-black px-5 py-2 rounded-full shadow-md hover:scale-105 transition-soft">ADMIN PANEL</button>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 min-h-screen">
+        
+        <section id="admin-panel" class="hidden space-y-8 mb-12">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
+                <h2 class="text-xl font-bold mb-5 text-blue-700">📥 নতুন অর্ডারসমূহ (Live)</h2>
+                <div id="order-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-orange-500">
+                <h2 class="text-xl font-bold mb-5 text-orange-700">➕ নতুন পণ্য যোগ করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="pName" placeholder="পণ্যের নাম" class="p-3 border rounded-2xl outline-none focus:ring-2 focus:ring-orange-500">
+                    <input type="number" id="pPrice" placeholder="দাম (৳)" class="p-3 border rounded-2xl outline-none focus:ring-2 focus:ring-orange-500">
+                    <input type="text" id="pImg" placeholder="Image Direct Link (http...)" class="p-3 border rounded-2xl bg-orange-50 outline-none focus:ring-2 focus:ring-orange-500">
+                    <button onclick="addNewProduct()" id="uploadBtn" class="md:col-span-3 bg-orange-600 text-white font-bold py-4 rounded-2xl hover:bg-orange-700 shadow-lg transition-soft">দোকানে পণ্য তুলুন</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold border-l-8 border-[#ff6000] pl-3 italic">আমাদের কালেকশন</h2>
+            <span class="text-[10px] font-bold text-green-500 animate-pulse uppercase tracking-widest">● Active Online</span>
+        </div>
+
+        <div id="product-list" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+    </main>
+
+    <div id="order-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-[40px] w-full max-w-sm shadow-2xl overflow-hidden modal-fade">
+            <div class="bkash-bg p-6 text-white text-center">
+                <h2 class="text-2xl font-bold">অর্ডার কনফার্ম করুন</h2>
+                <p id="p-label" class="text-xs font-bold mt-2 bg-black/20 py-1 rounded-full px-3 inline-block"></p>
+            </div>
+            
+            <div class="p-8 space-y-4">
+                <input type="text" id="cName" placeholder="আপনার নাম" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-pink-500">
+                <input type="tel" id="cPhone" placeholder="মোবাইল নম্বর (০১৭...)" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-pink-500">
+                <textarea id="cAddress" placeholder="ডেলিভারি ঠিকানা" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-pink-500"></textarea>
+                
+                <div class="bg-gray-100 p-4 rounded-2xl">
+                    <select id="payMethod" onchange="toggleBkash()" class="w-full bg-transparent font-bold outline-none cursor-pointer">
+                        <option value="Cash on Delivery">📦 ক্যাশ অন ডেলিভারি</option>
+                        <option value="Bkash">💖 বিকাশ (Bkash)</option>
+                    </select>
+                </div>
+
+                <div id="bkash-info" class="hidden bg-pink-50 p-5 rounded-3xl border-2 border-pink-100 text-center">
+                    <p class="text-[11px] text-pink-700 font-bold mb-3 italic">নিচের নম্বরে Send Money করুন:</p>
+                    <div class="bg-white p-3 rounded-2xl border-2 border-pink-400 mb-4 font-black text-2xl text-pink-600">01839454997</div>
+                    <input type="text" id="trxId" placeholder="বিকাশ করার পর TrxID দিন" class="w-full p-3 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-500">
+                </div>
+
+                <button onclick="confirmOrder()" id="finalBtn" class="w-full bkash-bg text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-lg">অর্ডার সম্পন্ন করুন</button>
+                <button onclick="closeModal()" class="w-full text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-2">বাতিল করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnVLPIGbxn2rrKL8EwGSCey9A8JNiZkBA",
+            authDomain: "hkrtechshop.firebaseapp.com",
+            projectId: "hkrtechshop",
+            storageBucket: "hkrtechshop.firebasestorage.app",
+            messagingSenderId: "988751396186",
+            appId: "1:988751396186:web:1fce5757b048963affc763"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const ADMIN_PASS = "HKR2026";
+        
+        let currentP = "";
+        let isAdminActive = false;
+        let unsubscribeProducts = null;
+        let unsubscribeOrders = null;
+
+        // XSS Protection (Fix #3)
+        function safeText(text = "") {
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Admin Access
+        window.openAdmin = () => {
+            if (prompt("অ্যাডমিন পাসওয়ার্ড দিন:") === ADMIN_PASS) {
+                isAdminActive = true;
+                document.getElementById('admin-panel').classList.remove('hidden');
+                refreshStore();
+                startOrdersListener();
+            } else { alert("ভুল পাসওয়ার্ড!"); }
+        };
+
+        // Modal Close (Fix #4)
+        window.closeModal = () => document.getElementById('order-modal').classList.add('hidden');
+        document.getElementById('order-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'order-modal') closeModal();
+        });
+
+        window.buyNow = (name) => {
+            currentP = name;
+            document.getElementById('p-label').innerText = "পণ্য: " + safeText(name);
+            document.getElementById('order-modal').classList.remove('hidden');
+        };
+
+        window.toggleBkash = () => {
+            const isBkash = document.getElementById('payMethod').value === 'Bkash';
+            document.getElementById('bkash-info').classList.toggle('hidden', !isBkash);
+        };
+
+        // Product Upload (Fix #6, #10)
+        window.addNewProduct = async () => {
+            const n = document.getElementById('pName').value.trim();
+            const pr = document.getElementById('pPrice').value.trim();
+            const im = document.getElementById('pImg').value.trim();
+
+            if (!n || !pr || !im) return alert("সব তথ্য দিন!");
+            if (!im.startsWith("http")) return alert("সঠিক ইমেজ লিঙ্ক দিন!");
+
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true; btn.innerText = "আপলোড হচ্ছে...";
+
+            try {
+                await addDoc(collection(db, "products"), { name: n, price: pr, img: im, time: serverTimestamp() });
+                alert("পণ্যটি দোকানে যোগ হয়েছে!");
+                document.getElementById('pName').value = ""; document.getElementById('pPrice').value = ""; document.getElementById('pImg').value = "";
+            } catch (e) { alert("Error!"); }
+            btn.disabled = false; btn.innerText = "দোকানে পণ্য তুলুন";
+        };
+
+        // Confirm Order (Fix #5)
+        window.confirmOrder = async () => {
+            const n = document.getElementById('cName').value.trim();
+            const ph = document.getElementById('cPhone').value.trim();
+            const ad = document.getElementById('cAddress').value.trim();
+            const m = document.getElementById('payMethod').value;
+            const t = document.getElementById('trxId').value.trim();
+
+            if (!n || !ph || !ad) return alert("সব তথ্য দিন!");
+            if (!/^01[3-9]\d{8}$/.test(ph)) return alert("সঠিক বাংলাদেশি মোবাইল নম্বর দিন!");
+            if (m === 'Bkash' && !t) return alert("বিকাশ করার পর TrxID দিন!");
+
+            const btn = document.getElementById('finalBtn');
+            btn.disabled = true; btn.innerText = "অর্ডার সাবমিট হচ্ছে...";
+
+            try {
+                await addDoc(collection(db, "orders"), { 
+                    product: currentP, customer: n, phone: ph, address: ad, method: m, trx: t || "N/A", date: serverTimestamp() 
+                });
+                alert("অর্ডার সফল হয়েছে!"); closeModal();
+            } catch (e) { alert("আবার চেষ্টা করুন।"); }
+            btn.disabled = false; btn.innerText = "অর্ডার সম্পন্ন করুন";
+        };
+
+        window.delProduct = async (id) => { if (confirm("ডিলিট করবেন?")) await deleteDoc(doc(db, "products", id)); };
+        window.delOrder = async (id) => { if (confirm("অর্ডারটি মুছবেন?")) await deleteDoc(doc(db, "orders", id)); };
+
+        // Duplicate Listener Handling (Fix #2)
+        function refreshStore() {
+            if (unsubscribeProducts) unsubscribeProducts();
+            unsubscribeProducts = onSnapshot(query(collection(db, "products"), orderBy("time", "desc")), (s) => {
+                const list = document.getElementById('product-list'); list.innerHTML = "";
+                s.forEach(d => {
+                    const p = d.data(); const id = d.id;
+                    list.innerHTML += `
+                        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden relative hover:shadow-2xl transition-soft group">
+                            ${isAdminActive ? `<button onclick="delProduct('${id}')" class="absolute top-3 right-3 z-20 bg-red-600 text-white w-8 h-8 rounded-full font-bold shadow-lg">✕</button>` : ''}
+                            <div class="h-40 overflow-hidden">
+                                <img src="${safeText(p.img)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-soft" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">
+                            </div>
+                            <div class="p-4 text-center">
+                                <h3 class="font-bold text-xs h-9 line-clamp-2 text-gray-700">${safeText(p.name)}</h3>
+                                <p class="text-[#ff6000] font-black text-lg my-2 italic">৳ ${safeText(p.price)}</p>
+                                <button onclick="buyNow('${safeText(p.name)}')" class="w-full bg-orange-500 text-white py-3 rounded-2xl text-[11px] font-black active:scale-95 transition-all">অর্ডার দিন</button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        function startOrdersListener() {
+            if (unsubscribeOrders) unsubscribeOrders();
+            unsubscribeOrders = onSnapshot(query(collection(db, "orders"), orderBy("date", "desc")), (s) => {
+                const d = document.getElementById('order-display'); d.innerHTML = "";
+                s.forEach(o => {
+                    const data = o.data(); const id = o.id;
+                    const time = data.date ? data.date.toDate().toLocaleString('bn-BD') : "লোড হচ্ছে...";
+                    d.innerHTML += `
+                        <div class="p-5 bg-white border-l-8 ${data.method==='Bkash'?'border-pink-500':'border-blue-500'} shadow-lg rounded-3xl relative">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="font-black text-sm text-gray-800">📦 ${safeText(data.product)}</p>
+                                <button onclick="delOrder('${id}')" class="text-red-400 text-xs font-bold">ডিলিট</button>
+                            </div>
+                            <p class="text-xs font-bold text-gray-600 mb-1">👤 ${safeText(data.customer)} (${safeText(data.phone)})</p>
+                            <p class="text-[10px] text-gray-400">🏠 ${safeText(data.address)}</p>
+                            <div class="mt-4 pt-3 border-t border-dashed flex justify-between items-center">
+                                <span class="text-[9px] font-black px-2 py-1 rounded-lg ${data.method==='Bkash'?'bg-pink-50 text-pink-600':'bg-blue-50 text-blue-600'} uppercase">
+                                    ${safeText(data.method)} | Trx: ${safeText(data.trx)}
+                                </span>
+                                <span class="text-[8px] text-gray-300 font-bold">${time}</span>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        // Init (Fix #9)
+        refreshStore();
+        window.addEventListener('offline', () => alert("আপনার ইন্টারনেট কানেকশন নেই!"));
+    </script>
+</body>
+</html>
